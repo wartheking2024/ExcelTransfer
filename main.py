@@ -1,5 +1,6 @@
 import pandas as pd
 from openpyxl import load_workbook
+import sys
 import shutil
 import os
 import json
@@ -7,6 +8,16 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
 from tkinter import ttk
 from PIL import Image, ImageTk  # 需安装 pillow 库：pip install pillow
+
+def resource_path(relative_path):
+    try:
+        # PyInstaller打包后会把资源放在临时文件夹
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 class StudentCardApp:
     def __init__(self, root):
@@ -56,7 +67,7 @@ class StudentCardApp:
         self.generate_btn.grid(row=5, column=1, pady=10)
 
         # “打赏作者”文本按钮，放同一行右侧一格
-        label_donate = tk.Label(frm, text="打赏作者", fg="blue", cursor="hand2")
+        label_donate = tk.Label(frm, text="联系作者", fg="blue", cursor="hand2")
         label_donate.grid(row=5, column=2, pady=10, padx=(10,0))
         label_donate.bind("<Button-1>", lambda e: self.show_qrcode())
 
@@ -66,18 +77,28 @@ class StudentCardApp:
         # 新窗口
         win = tk.Toplevel(self.root)
         win.title("打赏作者")
-        win.geometry("300x400")
+        win.geometry("300x450")
 
         try:
             # 加载图片
             from PIL import Image, ImageTk
-            img = Image.open("Pic/20250702222529.jpg")  # 这里改成你的二维码图片路径
+            img_path = resource_path("Pic/20250702222529.jpg")
+            img = Image.open(img_path)  # 这里改成你的二维码图片路径
             img = img.resize((250, 350))  # 调整大小适应窗口
             photo = ImageTk.PhotoImage(img)
+
+            # 添加文字提示
+            label_text = tk.Label(win, text="如果觉得好用，欢迎打赏支持开发 😊", font=("Arial", 12))
+            label_text.pack(pady=(10, 5))
 
             label = tk.Label(win, image=photo)
             label.image = photo  # 防止被垃圾回收
             label.pack(padx=10, pady=10)
+
+            # 添加文字提示
+            label_text1 = tk.Label(win, text="作者QQ:1322075214", fg="blue", font=("Arial", 12))
+            label_text1.pack(pady=(10, 5))
+
         except Exception as e:
             tk.Label(win, text=f"无法加载二维码图片:\n{e}").pack(padx=10, pady=10)
 
