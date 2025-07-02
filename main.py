@@ -6,6 +6,7 @@ import json
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
 from tkinter import ttk
+from PIL import Image, ImageTk  # 需安装 pillow 库：pip install pillow
 
 class StudentCardApp:
     def __init__(self, root):
@@ -53,6 +54,32 @@ class StudentCardApp:
 
         self.generate_btn = tk.Button(frm, text="开始生成", command=self.generate_cards, state=tk.DISABLED)
         self.generate_btn.grid(row=5, column=1, pady=10)
+
+        # “打赏作者”文本按钮，放同一行右侧一格
+        label_donate = tk.Label(frm, text="打赏作者", fg="blue", cursor="hand2")
+        label_donate.grid(row=5, column=2, pady=10, padx=(10,0))
+        label_donate.bind("<Button-1>", lambda e: self.show_qrcode())
+
+
+
+    def show_qrcode(self):
+        # 新窗口
+        win = tk.Toplevel(self.root)
+        win.title("打赏作者")
+        win.geometry("300x400")
+
+        try:
+            # 加载图片
+            from PIL import Image, ImageTk
+            img = Image.open("Pic/20250702222529.jpg")  # 这里改成你的二维码图片路径
+            img = img.resize((250, 350))  # 调整大小适应窗口
+            photo = ImageTk.PhotoImage(img)
+
+            label = tk.Label(win, image=photo)
+            label.image = photo  # 防止被垃圾回收
+            label.pack(padx=10, pady=10)
+        except Exception as e:
+            tk.Label(win, text=f"无法加载二维码图片:\n{e}").pack(padx=10, pady=10)
 
     def get_mapping_file_path(self):
         if not self.source_path.get():
